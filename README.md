@@ -62,7 +62,7 @@ Below is a minimal example of how to embed a Framer configurator using the `<spc
 
 ## Attributes
 
-Attribute for `<spc-embedded-configurator>`
+Attributes for `<spc-embedded-configurator>`
 
 | Attribute                   | Type      | Description                                                                                                                                        | Example                                   |
 |-----------------------------|-----------|----------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------|
