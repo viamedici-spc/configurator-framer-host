@@ -1,0 +1,12 @@
+{
+  "version" : "1.0.0",
+  "name" : "@viamedici-spc/configurator-framer-host-test-app",
+  "private" : true,
+  "dependencies" : {},
+  "devDependencies" : {
+    "express" : "^5.1.0"
+  },
+  "scripts" : {
+    "start" : "node start.js"
+  }
+}

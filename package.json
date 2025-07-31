@@ -1,0 +1,54 @@
+{
+  "name" : "@viamedici-spc/configurator-framer-host",
+  "version" : "0.0.0",
+  "description" : "Provides a Web Component for host applications to embed a Framer based Viamedici SPC configurator.",
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/viamedici-spc/configurator-framer-host.git"
+  },
+  "sideEffects" : false,
+  "files" : [
+    "dist"
+  ],
+  "module" : "dist/index.mjs",
+  "types" : "dist/index.d.ts",
+  "exports" : {
+    "." : {
+      "types" : "./dist/index.d.ts",
+      "import" : "./dist/index.mjs"
+    }
+  },
+  "scripts" : {
+    "build" : "vite build",
+    "dev" : "vite build --watch --mode development & vite preview",
+    "typecheck" : "tsc --noEmit"
+  },
+  "keywords" : [
+    "spc",
+    "hca",
+    "csp",
+    "constraint",
+    "satisfaction",
+    "problem",
+    "solver",
+    "viamedici",
+    "webcomponent",
+    "configurator",
+    "product configuration",
+    "embedding",
+    "host",
+    "framer"
+  ],
+  "author" : "Viamedici Software GmbH",
+  "license" : "MIT",
+  "devDependencies" : {
+    "npm-sort" : "^0.0.4",
+    "typescript" : "^5.1.6",
+    "vite" : "^4.4.8",
+    "vite-plugin-checker" : "^0.6.1",
+    "vite-plugin-dts" : "^3.5.0"
+  },
+  "dependencies" : {
+    "url-join" : "^5.0.0"
+  }
+}
