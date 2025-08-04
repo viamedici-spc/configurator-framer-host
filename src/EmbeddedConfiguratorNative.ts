@@ -56,10 +56,11 @@ export default class EmbeddedConfiguratorNative extends HTMLElement {
             const html = await response.text();
             const doc = new DOMParser().parseFromString(html, "text/html");
 
-            // Mandatory elements to bootstrap the app
-            const style = doc.querySelector("style[data-framer-css-ssr-minified]");
+            // Elements to bootstrap the app
+            const style = doc.querySelector("style[data-framer-css-ssr-minified]") || doc.querySelector("style[data-framer-css-ssr]");
             const mainDiv = doc.querySelector("div#main");
-            const script = doc.querySelector('script[data-framer-bundle="main"]');
+            const mainScript = doc.querySelector('script[data-framer-bundle="main"]');
+            const importMapScript = doc.querySelector('script[type="importmap"][data-framer-importmap]');
 
             if (!style || !style.textContent) {
                 console.error("[Configurator] Failed to bootstrap configurator app: Could not find the style element.");
@@ -71,8 +72,8 @@ export default class EmbeddedConfiguratorNative extends HTMLElement {
                 return;
             }
 
-            if (!script || !(script instanceof HTMLScriptElement)) {
-                console.error("[Configurator] Failed to bootstrap configurator app: Could not find the entry script.");
+            if (!mainScript || !(mainScript instanceof HTMLScriptElement)) {
+                console.error("[Configurator] Failed to bootstrap configurator app: Could not find the main entry script.");
                 return;
             }
 
@@ -101,15 +102,31 @@ export default class EmbeddedConfiguratorNative extends HTMLElement {
             // Inject main div
             this.appendChild(mainDiv.cloneNode());
 
-            // Inject entry script
-            const newScript = document.createElement("script");
-            newScript.type = "module";
-            newScript.src = script.src;
-            newScript.setAttribute("async", "");
-            this.appendChild(newScript);
+            // Optionally inject import map script
+            if (importMapScript && importMapScript.textContent) {
+                const newImportMapScript = document.createElement("script");
+                newImportMapScript.type = "importmap";
+                newImportMapScript.textContent = importMapScript.textContent;
+                this.appendChild(newImportMapScript);
+            }
+
+            // Inject main entry script
+            if (mainScript.src) {
+                const newScript = document.createElement("script");
+                newScript.type = "module";
+                newScript.src = mainScript.src;
+                newScript.setAttribute("async", "");
+                this.appendChild(newScript);
+            } else if (mainScript.textContent) {
+                const inlineScript = document.createElement("script");
+                inlineScript.type = "module";
+                inlineScript.textContent = mainScript.textContent;
+                this.appendChild(inlineScript);
+            } else {
+                console.error("[Configurator] Script tag found, but no src or content available.");
+            }
         } catch (e) {
             console.error("[Configurator] Failed to bootstrap configurator app", e);
         }
     }
 }
-

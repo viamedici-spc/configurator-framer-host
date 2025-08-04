@@ -38,7 +38,7 @@ Or use it directly via a CDN (e.g. jsDelivr):
 
 ```html
 
-<script type="module" src="https://cdn.jsdelivr.net/npm/@viamedici-spc/configurator-framer-host@1.0.0"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@viamedici-spc/configurator-framer-host@1.1.0"></script>
 ```
 
 ## Getting Started
