@@ -92,7 +92,8 @@ export default class EmbeddedConfiguratorNative extends HTMLElement {
                         // Remove some rules that may interfere too much with the host
                         trimmed.startsWith("html,body,#main") ||
                         trimmed.startsWith("h1,h2,h3,h4,h5,h6,p,figure") ||
-                        trimmed.startsWith("body,input,textarea,select,button")
+                        trimmed.startsWith("body,input,textarea,select,button") ||
+                        trimmed.startsWith("*")
                     );
                 })
                 .map(rule => rule.trim())
