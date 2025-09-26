@@ -63,59 +63,71 @@ export default class EmbeddedConfiguratorNative extends HTMLElement {
             const mainScript = doc.querySelector('script[data-framer-bundle="main"]');
             const importMapScript = doc.querySelector('script[type="importmap"][data-framer-importmap]');
 
-            if (!style || !style.textContent) {
-                console.error("[Configurator] Failed to bootstrap configurator app: Could not find the CSS style element.");
-                return;
-            }
-
-            if (!fonts || !fonts.textContent) {
-                console.error("[Configurator] Failed to bootstrap configurator app: Could not find the fonts style element.");
-                return;
-            }
-
-            if (!mainDiv) {
-                console.error("[Configurator] Failed to bootstrap configurator app: Could not find the main div.");
-                return;
-            }
-
-            if (!mainScript || !(mainScript instanceof HTMLScriptElement)) {
-                console.error("[Configurator] Failed to bootstrap configurator app: Could not find the main entry script.");
-                return;
-            }
-
             // Inject static CSS
-            const cleanedCss = style.textContent
-                .split("}")
-                .filter(rule => {
-                    const trimmed = rule.trim();
-                    return !(
-                        // Remove some rules that may interfere too much with the host
-                        trimmed.startsWith("html,body,#main") ||
-                        trimmed.startsWith("h1,h2,h3,h4,h5,h6,p,figure") ||
-                        trimmed.startsWith("body,input,textarea,select,button") ||
-                        trimmed.startsWith("*")
-                    );
-                })
-                .map(rule => rule.trim())
-                .join("}\n");
+            if (style && style.textContent) {
+                const cleanedCss = style.textContent
+                    .split("}")
+                    .filter(rule => {
+                        const trimmed = rule.trim();
+                        return !(
+                            // Remove some rules that may interfere too much with the host
+                            trimmed.startsWith("html,body,#main") ||
+                            trimmed.startsWith("h1,h2,h3,h4,h5,h6,p,figure") ||
+                            trimmed.startsWith("body,input,textarea,select,button") ||
+                            trimmed.startsWith("*")
+                        );
+                    })
+                    .map(rule => rule.trim())
+                    .join("}\n");
 
-            const cleanedStyle = document.createElement("style");
-            for (const attr of style.attributes) {
-                cleanedStyle.setAttribute(attr.name, attr.value);
+                const cleanedStyle = document.createElement("style");
+                for (const attr of style.attributes) {
+                    cleanedStyle.setAttribute(attr.name, attr.value);
+                }
+                cleanedStyle.textContent = cleanedCss;
+                this.appendChild(cleanedStyle);
+            } else {
+                console.warn("[Configurator] Bootstrapping configurator app: Could not find the CSS style element.");
             }
-            cleanedStyle.textContent = cleanedCss;
-            this.appendChild(cleanedStyle);
 
             // Inject static fonts
-            const clonedFonts = document.createElement("style");
-            for (const attr of fonts.attributes) {
-                clonedFonts.setAttribute(attr.name, attr.value);
+            if (fonts && fonts.textContent) {
+                const clonedFonts = document.createElement("style");
+                for (const attr of fonts.attributes) {
+                    clonedFonts.setAttribute(attr.name, attr.value);
+                }
+                clonedFonts.textContent = fonts.textContent;
+                this.appendChild(clonedFonts);
+            } else {
+                console.warn("[Configurator] Bootstrapping configurator app: Could not find the fonts style element.");
             }
-            clonedFonts.textContent = fonts.textContent;
-            this.appendChild(clonedFonts);
 
             // Inject main div
-            this.appendChild(mainDiv.cloneNode());
+            if (mainDiv) {
+                this.appendChild(mainDiv.cloneNode());
+            } else {
+                console.warn("[Configurator] Bootstrapping configurator app: Could not find the main div.");
+            }
+
+            if (mainScript && (mainScript instanceof HTMLScriptElement)) {
+                // Inject main entry script
+                if (mainScript.src) {
+                    const newScript = document.createElement("script");
+                    newScript.type = "module";
+                    newScript.src = mainScript.src;
+                    newScript.setAttribute("async", "");
+                    this.appendChild(newScript);
+                } else if (mainScript.textContent) {
+                    const inlineScript = document.createElement("script");
+                    inlineScript.type = "module";
+                    inlineScript.textContent = mainScript.textContent;
+                    this.appendChild(inlineScript);
+                } else {
+                    console.error("[Configurator] Script tag found, but no src or content available.");
+                }
+            } else {
+                console.warn("[Configurator] Bootstrapping configurator app: Could not find the main entry script.");
+            }
 
             // Optionally inject import map script
             if (importMapScript && importMapScript.textContent) {
@@ -123,22 +135,6 @@ export default class EmbeddedConfiguratorNative extends HTMLElement {
                 newImportMapScript.type = "importmap";
                 newImportMapScript.textContent = importMapScript.textContent;
                 this.appendChild(newImportMapScript);
-            }
-
-            // Inject main entry script
-            if (mainScript.src) {
-                const newScript = document.createElement("script");
-                newScript.type = "module";
-                newScript.src = mainScript.src;
-                newScript.setAttribute("async", "");
-                this.appendChild(newScript);
-            } else if (mainScript.textContent) {
-                const inlineScript = document.createElement("script");
-                inlineScript.type = "module";
-                inlineScript.textContent = mainScript.textContent;
-                this.appendChild(inlineScript);
-            } else {
-                console.error("[Configurator] Script tag found, but no src or content available.");
             }
         } catch (e) {
             console.error("[Configurator] Failed to bootstrap configurator app", e);
