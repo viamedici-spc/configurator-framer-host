@@ -58,12 +58,18 @@ export default class EmbeddedConfiguratorNative extends HTMLElement {
 
             // Elements to bootstrap the app
             const style = doc.querySelector("style[data-framer-css-ssr-minified]") || doc.querySelector("style[data-framer-css-ssr]");
+            const fonts = doc.querySelector("style[data-framer-fonts-ssr-minified]") || doc.querySelector("style[data-framer-font-css]");
             const mainDiv = doc.querySelector("div#main");
             const mainScript = doc.querySelector('script[data-framer-bundle="main"]');
             const importMapScript = doc.querySelector('script[type="importmap"][data-framer-importmap]');
 
             if (!style || !style.textContent) {
-                console.error("[Configurator] Failed to bootstrap configurator app: Could not find the style element.");
+                console.error("[Configurator] Failed to bootstrap configurator app: Could not find the CSS style element.");
+                return;
+            }
+
+            if (!fonts || !fonts.textContent) {
+                console.error("[Configurator] Failed to bootstrap configurator app: Could not find the fonts style element.");
                 return;
             }
 
@@ -98,6 +104,14 @@ export default class EmbeddedConfiguratorNative extends HTMLElement {
             }
             cleanedStyle.textContent = cleanedCss;
             this.appendChild(cleanedStyle);
+
+            // Inject static fonts
+            const clonedFonts = document.createElement("style");
+            for (const attr of fonts.attributes) {
+                clonedFonts.setAttribute(attr.name, attr.value);
+            }
+            clonedFonts.textContent = fonts.textContent;
+            this.appendChild(clonedFonts);
 
             // Inject main div
             this.appendChild(mainDiv.cloneNode());
