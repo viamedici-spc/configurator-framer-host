@@ -1,7 +1,7 @@
 import urlJoin from "url-join";
 
 export default class EmbeddedConfiguratorNative extends HTMLElement {
-    static readonly proxyBaseUrl = "https://spc.cloud.ceventis.de/framer/host-proxy";
+    static readonly proxyBaseUrl = "https://spc.viamedici.io/framer/host-proxy";
     static readonly attributeNames = ["src", "proxy-base-url"];
 
     static get observedAttributes() {
