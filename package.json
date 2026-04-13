@@ -4,7 +4,7 @@
   "description" : "Provides a Web Component for host applications to embed a Framer based Viamedici SPC configurator.",
   "repository" : {
     "type" : "git",
-    "url" : "https://github.com/viamedici-spc/configurator-framer-host.git"
+    "url" : "git+https://github.com/viamedici-spc/configurator-framer-host.git"
   },
   "publishConfig" : {
     "access" : "public"
