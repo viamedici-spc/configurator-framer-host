@@ -65,17 +65,21 @@ export default class EmbeddedConfiguratorNative extends HTMLElement {
 
             // Inject static CSS
             if (style && style.textContent) {
+                // Selectors to remove because they would interfere too much with the host.
+                // Whitespace between selectors is normalized away so we match both
+                // minified ("a,b,c") and pretty-printed ("a, b, c") output from Framer apps.
+                const targetPrefixes = [
+                    "html,body,#main",
+                    "h1,h2,h3,h4,h5,h6,p,figure",
+                    "body,input,textarea,select,button",
+                    "*",
+                ];
+
                 const cleanedCss = style.textContent
                     .split("}")
                     .filter(rule => {
-                        const trimmed = rule.trim();
-                        return !(
-                            // Remove some rules that may interfere too much with the host
-                            trimmed.startsWith("html,body,#main") ||
-                            trimmed.startsWith("h1,h2,h3,h4,h5,h6,p,figure") ||
-                            trimmed.startsWith("body,input,textarea,select,button") ||
-                            trimmed.startsWith("*")
-                        );
+                        const normalized = rule.trim().replace(/,\s+/g, ",");
+                        return !targetPrefixes.some(prefix => normalized.startsWith(prefix));
                     })
                     .map(rule => rule.trim())
                     .join("}\n");
