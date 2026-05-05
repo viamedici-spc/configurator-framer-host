@@ -55,7 +55,7 @@ Below is a minimal example of how to embed a Framer configurator using the `<spc
     <script type="module" src="https://cdn.jsdelivr.net/npm/@viamedici-spc/configurator-framer-host@1.0.0"></script>
 </head>
 <body>
-    <spc-embedded-configurator src="https://example.framer.app" isolated="true"/>
+<spc-embedded-configurator src="https://example.framer.app" isolated="true"/>
 </body>
 </html>
 ```
@@ -64,11 +64,22 @@ Below is a minimal example of how to embed a Framer configurator using the `<spc
 
 Attributes for `<spc-embedded-configurator>`
 
-| Attribute                   | Type      | Description                                                                                                                                        | Example                                   |
-|-----------------------------|-----------|----------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------|
-| `src`                       | `string`  | URL of the Framer-based configurator to embed.
-| `isolated`                  | `boolean` | If `true`, the configurator runs in sandboxed iframe mode.<br/>Default: `false`                                                                         | `true`, `false` or `undefined` |
-| `no-auto-height`            | `boolean` | if true, it disables automatic resizing of the iframe to match the configurator's content height. Only applicable when `isolated` mode is enabled.<br/>Default: `false` | `true`, `false` or `undefined` |
+| Attribute        | Type      | Description                                                                                                                                                             | Example                        |
+|------------------|-----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------|
+| `src`            | `string`  | URL of the Framer-based configurator to embed.
+| `isolated`       | `boolean` | If `true`, the configurator runs in sandboxed iframe mode.<br/>Default: `false`                                                                                         | `true`, `false` or `undefined` |
+| `no-auto-height` | `boolean` | if true, it disables automatic resizing of the iframe to match the configurator's content height. Only applicable when `isolated` mode is enabled.<br/>Default: `false` | `true`, `false` or `undefined` |
+
+## Releasing
+
+After publishing a new version to npm, jsDelivr may continue to serve the previous version for floating URLs (e.g. `@1`, `@latest`) for up to 12 hours per edge node, because each CDN edge caches the resolved file independently.
+
+To make the new version available immediately on all edges and CDN providers, trigger a global purge once npm has accepted the publish:
+
+```bash
+curl -fsS "https://purge.jsdelivr.net/npm/@viamedici-spc/configurator-framer-host@1"
+curl -fsS "https://purge.jsdelivr.net/npm/@viamedici-spc/configurator-framer-host@latest"
+```
 
 ## License
 
