@@ -7,8 +7,8 @@ jobs:
         permissions:
             contents: read
             id-token: write
-        uses: viamedici-spc/github-ci/.github/workflows/build-npm.yml@v3
+        uses: viamedici-spc/github-ci/.github/workflows/build-npm.yml@feature/fix-gitversion
         with:
             node-version: '24'
             build-verbs: 'build'
-            skip-publish: false
+            skip-publish: true
