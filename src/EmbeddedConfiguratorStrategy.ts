@@ -1,5 +1,6 @@
 import EmbeddedConfiguratorNative from "./EmbeddedConfiguratorNative";
 import EmbeddedConfiguratorIFrame from "./EmbeddedConfiguratorIFrame";
+import {isParameterAttribute} from "./parameters";
 
 export default class EmbeddedConfiguratorStrategy extends HTMLElement {
     static childAttributes = [...EmbeddedConfiguratorNative.attributeNames, ...EmbeddedConfiguratorIFrame.attributeNames];
@@ -10,6 +11,7 @@ export default class EmbeddedConfiguratorStrategy extends HTMLElement {
 
     private child: HTMLElement | null = null;
     private isIsolated: boolean = false;
+    private parameterObserver: MutationObserver | null = null;
 
     constructor() {
         super();
@@ -17,9 +19,11 @@ export default class EmbeddedConfiguratorStrategy extends HTMLElement {
 
     connectedCallback() {
         this.initialize();
+        this.startParameterObserver();
     }
 
     disconnectedCallback() {
+        this.stopParameterObserver();
         if (this.child && this.contains(this.child)) {
             this.removeChild(this.child);
         }
@@ -63,11 +67,47 @@ export default class EmbeddedConfiguratorStrategy extends HTMLElement {
 
         const element = document.createElement(tagName);
         for (const {name, value} of Array.from(this.attributes)) {
-            if (EmbeddedConfiguratorStrategy.childAttributes.some(a => a === name) && value !== null) {
+            const forward = EmbeddedConfiguratorStrategy.childAttributes.some(a => a === name) || isParameterAttribute(name);
+            if (forward && value !== null) {
                 element.setAttribute(name, value);
             }
         }
         this.appendChild(element);
         this.child = element;
+    }
+
+    /**
+     * Custom parameter attributes (`data-*`) can have arbitrary names, so they cannot be
+     * enumerated in the static `observedAttributes`. A MutationObserver forwards their
+     * changes to the active child. It is intentionally scoped to parameter attributes only,
+     * so it never overlaps with `attributeChangedCallback`, which owns the known attributes.
+     */
+    private startParameterObserver() {
+        if (this.parameterObserver) {
+            return;
+        }
+        this.parameterObserver = new MutationObserver(mutations => {
+            if (!this.child) {
+                return;
+            }
+            for (const mutation of mutations) {
+                const name = mutation.attributeName;
+                if (mutation.type !== "attributes" || name == null || !isParameterAttribute(name)) {
+                    continue;
+                }
+                const value = this.getAttribute(name);
+                if (value === null) {
+                    this.child.removeAttribute(name);
+                } else {
+                    this.child.setAttribute(name, value);
+                }
+            }
+        });
+        this.parameterObserver.observe(this, {attributes: true});
+    }
+
+    private stopParameterObserver() {
+        this.parameterObserver?.disconnect();
+        this.parameterObserver = null;
     }
 }

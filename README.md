@@ -69,6 +69,28 @@ Attributes for `<spc-embedded-configurator>`
 | `src`            | `string`  | URL of the Framer-based configurator to embed.
 | `isolated`       | `boolean` | If `true`, the configurator runs in sandboxed iframe mode.<br/>Default: `false`                                                                                         | `true`, `false` or `undefined` |
 | `no-auto-height` | `boolean` | if true, it disables automatic resizing of the iframe to match the configurator's content height. Only applicable when `isolated` mode is enabled.<br/>Default: `false` | `true`, `false` or `undefined` |
+| `data-*`         | `string`  | Custom parameters forwarded to the configurator app (see below).                                                                                                        | `data-region="eu"`             |
+
+## Custom Parameters
+
+Any attribute prefixed with `data-` is forwarded to the embedded configurator as a custom parameter. This lets the host
+pass runtime context — for example a configuration model id, a region, or whether the configurator runs inside a webshop.
+The `data-` prefix is stripped to form the parameter key, so `data-region="eu"` arrives as the parameter `region` with the
+value `"eu"`. Browsers lowercase attribute names, so keys are always lowercase.
+
+```html
+<spc-embedded-configurator
+        src="https://example.framer.app"
+        data-configuration-model-id="123"
+        data-region="eu"
+        data-webshop="true"/>
+```
+
+Parameters work identically in native and isolated (iframe) mode and **hot-reload**: changing an attribute at runtime
+propagates to the configurator without reloading the page. The configurator reads them via the `useHostParameter` /
+`useHostParameters` hooks from `@viamedici-spc/configurator-framer`.
+
+> Note: every `data-*` attribute is treated as a parameter, including generic ones such as `data-testid`.
 
 ## Releasing
 
