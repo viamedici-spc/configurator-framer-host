@@ -108,7 +108,7 @@ export default class EmbeddedConfiguratorNative extends HTMLElement {
 
             // Inject main div
             if (mainDiv) {
-                this.appendChild(mainDiv.cloneNode());
+                this.appendChild(mainDiv.cloneNode(true));
             } else {
                 console.warn("[Configurator] Bootstrapping configurator app: Could not find the main div.");
             }
